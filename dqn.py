@@ -7,8 +7,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.autograd as autograd
 import math, random
-Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if USE_CUDA else autograd.Variable(*args, **kwargs)
+
 USE_CUDA = torch.cuda.is_available()
+Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).to(device) if USE_CUDA else autograd.Variable(*args, **kwargs)
 
 Transition = namedtuple('Transition',
                         ('state', 'action', 'reward', 'next_state', 'done'))
@@ -65,7 +66,6 @@ class QLearner(nn.Module):
         
 def compute_td_loss(policy_model, target_model, batch_size, gamma, replay_buffer, device):
     state, action, reward, next_state, done = replay_buffer.sample(batch_size)
-    lambd = 0.5
 
     # Compute a mask of non-final states and concatenate the batch elements
     # (a final state would've been the one after which simulation ended)

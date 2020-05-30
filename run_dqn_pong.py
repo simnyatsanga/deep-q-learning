@@ -21,7 +21,9 @@ num_frames = 10000000
 batch_size = 32
 gamma = 0.99
 target_update = 1000
-    
+epsilon_start = 1.0
+epsilon_final = 0.02
+epsilon_decay = 1000000
 replay_initial = 10000
 replay_buffer = ReplayBuffer(1000000)
 
@@ -33,12 +35,9 @@ target_model.eval()
 optimizer = optim.Adam(policy_model.parameters(), lr=0.00001)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if USE_CUDA:
-    policy_model = policy_model.cuda()
-    target_model = target_model.cuda()
+    policy_model = policy_model.to(device)
+    target_model = target_model.to(device)
 
-epsilon_start = 1.0
-epsilon_final = 0.01
-epsilon_decay = 30000
 epsilon_by_frame = lambda frame_idx: epsilon_final + (epsilon_start - epsilon_final) * math.exp(-1. * frame_idx / epsilon_decay)
 
 losses = []
