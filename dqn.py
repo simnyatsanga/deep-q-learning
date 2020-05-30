@@ -101,7 +101,7 @@ def compute_td_loss(policy_model, target_model, batch_size, gamma, replay_buffer
     # TODO: Implement the Temporal Difference Loss
     
     # Compute Huber loss
-    loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+    loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)
 
     # mse_loss = nn.MSELoss()
     # loss = mse_loss(state_action_values, expected_state_action_values)
