@@ -80,7 +80,6 @@ for frame_idx in range(1, num_frames + 1):
     
     # Update the target network, copying all weights and biases in DQN
     if frame_idx % target_update == 0:
-        print("Updating target_model parameters with policy_model parameters.")
         target_model.load_state_dict(policy_model.state_dict())
 
 torch.save(policy_model.state_dict(), "dqn_pong_model")
