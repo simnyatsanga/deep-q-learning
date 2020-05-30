@@ -9,6 +9,7 @@ import torch.autograd as autograd
 import math, random
 
 USE_CUDA = torch.cuda.is_available()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).to(device) if USE_CUDA else autograd.Variable(*args, **kwargs)
 
 Transition = namedtuple('Transition',
