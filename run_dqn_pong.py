@@ -17,13 +17,13 @@ env = make_atari(env_id)
 env = wrap_deepmind(env)
 env = wrap_pytorch(env)
 
-num_frames = 1000000
+num_frames = 10000000
 batch_size = 32
 gamma = 0.99
-target_update = 10
+target_update = 1000
     
 replay_initial = 10000
-replay_buffer = ReplayBuffer(100000)
+replay_buffer = ReplayBuffer(1000000)
 
 policy_model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
 target_model = QLearner(env, num_frames, batch_size, gamma, replay_buffer)
@@ -81,3 +81,5 @@ for frame_idx in range(1, num_frames + 1):
     # Update the target network, copying all weights and biases in DQN
     if frame_idx % target_update == 0:
         target_model.load_state_dict(policy_model.state_dict())
+
+torch.save(policy_model.state_dict(), "dqn_pong_model")

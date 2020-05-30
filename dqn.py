@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.autograd as autograd
 import math, random
 Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if USE_CUDA else autograd.Variable(*args, **kwargs)
@@ -54,8 +55,9 @@ class QLearner(nn.Module):
             ######## YOUR CODE HERE! ########
             # TODO: Given state, you should write code to get the Q value and chosen action
             # Complete the R.H.S. of the following 2 lines and uncomment them
-            q_value = self.forward(state)
-            action = torch.argmax(q_value).item() 
+            q_values = self.forward(state)
+            # action = torch.argmax(q_values).item() 
+            action = q_values.max(1)[1].view(1, 1).item()
             ######## YOUR CODE HERE! ########
         else: # Explore
             action = random.randrange(self.env.action_space.n)
@@ -95,16 +97,14 @@ def compute_td_loss(policy_model, target_model, batch_size, gamma, replay_buffer
     # Compute the expected Q values: r + gamma * max_a(Q(s', a))
     expected_state_action_values = reward_batch + (gamma * next_state_values)
 
-    # Compute Huber loss
-    # loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-   
-    mse_loss = nn.MSELoss()
-    loss = mse_loss(state_action_values, expected_state_action_values)
-
     ######## YOUR CODE HERE! ########
     # TODO: Implement the Temporal Difference Loss
-    mse_loss = nn.MSELoss()
-    loss = mse_loss(state_action_values, expected_state_action_values)
+    
+    # Compute Huber loss
+    loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+
+    # mse_loss = nn.MSELoss()
+    # loss = mse_loss(state_action_values, expected_state_action_values)
     ######## YOUR CODE HERE! ########
     return loss
 
