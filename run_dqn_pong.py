@@ -67,6 +67,8 @@ for frame_idx in range(1, num_frames + 1):
         loss = compute_td_loss(policy_model, target_model, batch_size, gamma, replay_buffer, device)
         optimizer.zero_grad()
         loss.backward()
+        for param in policy_model.parameters():
+            param.grad.data.clamp_(-1, 1)
         optimizer.step()
         losses.append(loss.data.cpu().numpy())
 
