@@ -86,6 +86,7 @@ def compute_td_loss(policy_model, target_model, batch_size, gamma, replay_buffer
     # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
     # columns of actions taken. These are the actions which would've been taken
     # for each state according to the policy_model
+    # NOTE: This returns a (32, 1) shape because of the .gather(...)
     state_action_values = policy_model.forward(state_batch).gather(1, action_batch)
 
     # Compute V(s_{t+1}) for all next states.
@@ -103,7 +104,8 @@ def compute_td_loss(policy_model, target_model, batch_size, gamma, replay_buffer
     # TODO: Implement the Temporal Difference Loss
     
     # Compute Huber loss
-    loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)
+    # NOTE: Reshape expected_state_action_values to (32, 1) shape to match state_action_values
+    loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
 
     # mse_loss = nn.MSELoss()
     # loss = mse_loss(state_action_values, expected_state_action_values)
