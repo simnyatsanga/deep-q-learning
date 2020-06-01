@@ -83,4 +83,8 @@ for frame_idx in range(1, num_frames + 1):
     if frame_idx % target_update == 0:
         target_model.load_state_dict(policy_model.state_dict())
 
-torch.save(policy_model.state_dict(), "dqn_pong_model")
+    if frame_idx % 1000000 == 0:
+        model_filename = "dqn_pong_model_%s" % (frame_idx)
+        torch.save(policy_model.state_dict(), model_filename)
+
+torch.save(policy_model.state_dict(), "dqn_pong_model_final")
