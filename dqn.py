@@ -57,9 +57,9 @@ class QLearner(nn.Module):
             ######## YOUR CODE HERE! ########
             # TODO: Given state, you should write code to get the Q value and chosen action
             # Complete the R.H.S. of the following 2 lines and uncomment them
-            q_values = self.forward(state)
-            # action = torch.argmax(q_values).item() 
-            action = q_values.max(1)[1].view(1, 1).item()
+            with torch.no_grad():
+                q_values = self.forward(state)
+                action = q_values.max(1)[1].view(1, 1).item()
             ######## YOUR CODE HERE! ########
         else: # Explore
             action = random.randrange(self.env.action_space.n)
@@ -75,17 +75,18 @@ def compute_td_loss(policy_model, target_model, batch_size, gamma, replay_buffer
     for i, nx_state in enumerate(next_state):
         if done[i] == False:
             non_final_next_states.append(nx_state)
+    
     non_final_next_states = Variable(torch.FloatTensor(np.float32(non_final_next_states)))
-
     state_batch = Variable(torch.FloatTensor(np.float32(state)))
     next_state_batch = Variable(torch.FloatTensor(np.float32(next_state)), requires_grad=True)
-    action_batch = Variable(torch.LongTensor(action))
+    action_batch = Variable(torch.LongTensor(action)).reshape(batch_size, 1)
     reward_batch = Variable(torch.FloatTensor(reward))
     done_batch = Variable(torch.FloatTensor(done))
 
     # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
-    # columns of actions taken.
-    state_action_values = policy_model.forward(state_batch).max(1)[0]
+    # columns of actions taken. These are the actions which would've been taken
+    # for each state according to the policy_model
+    state_action_values = policy_model.forward(state_batch).gather(1, action_batch)
 
     # Compute V(s_{t+1}) for all next states.
     # Expected values of actions for non_final_next_states are computed based
