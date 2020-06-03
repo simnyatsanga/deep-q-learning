@@ -2,6 +2,7 @@ from Wrapper.layers import *
 from Wrapper.wrappers import make_atari, wrap_deepmind, wrap_pytorch
 import math, random
 import gym
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
@@ -42,11 +43,13 @@ epsilon_by_frame = lambda frame_idx: epsilon_final + (epsilon_start - epsilon_fi
 
 losses = []
 all_rewards = []
+mean_losses = []
+mean_rewards = []
 episode_reward = 0
 
 state = env.reset()
 
-
+start_training = time.time()
 for frame_idx in range(1, num_frames + 1):
 
     epsilon = epsilon_by_frame(frame_idx)
@@ -76,15 +79,30 @@ for frame_idx in range(1, num_frames + 1):
         print('#Frame: %d, preparing replay buffer' % frame_idx)
 
     if frame_idx % 10000 == 0 and len(replay_buffer) > replay_initial:
+        mean_losses.append(np.mean(losses))
         print('#Frame: %d, Loss: %f' % (frame_idx, np.mean(losses)))
+        mean_rewards.append(np.mean(all_rewards[-10:]))
         print('Last-10 average reward: %f' % np.mean(all_rewards[-10:]))
     
     # Update the target network, copying all weights and biases in DQN
     if frame_idx % target_update == 0:
         target_model.load_state_dict(policy_model.state_dict())
-
+    
+    # Saving checkpoints after every million frames
     if frame_idx % 1000000 == 0:
         model_filename = "dqn_pong_model_%s" % (frame_idx)
         torch.save(policy_model.state_dict(), model_filename)
 
+end_training = time.time()
+
+print(f'Total training time - {(end_time - start_training) / 3600} hours')
+
+# Save all mean losses and rewards
+with open('mean_losses.npy', 'wb') as losses_file:
+    np.save(losses_file, np.array(mean_losses))
+
+with open('mean_rewards.npy', 'wb') as rewards_file:
+    np.save(rewards_file, np.array(mean_rewards))
+
+# Save the final policy model
 torch.save(policy_model.state_dict(), "dqn_pong_model_final")
