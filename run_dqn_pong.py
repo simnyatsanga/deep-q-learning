@@ -18,7 +18,7 @@ env = make_atari(env_id)
 env = wrap_deepmind(env)
 env = wrap_pytorch(env)
 
-num_frames = 10000000
+num_frames = 7000000
 batch_size = 32
 gamma = 0.99
 target_update = 1000
@@ -97,10 +97,11 @@ end_training = time.time()
 
 print(f'Total training time - {(end_time - start_training) / 3600} hours')
 
-# Save all mean losses and rewards
+# Save all mean losses
 with open('mean_losses.npy', 'wb') as losses_file:
     np.save(losses_file, np.array(mean_losses))
 
+# Save all mean rewards
 with open('mean_rewards.npy', 'wb') as rewards_file:
     np.save(rewards_file, np.array(mean_rewards))
 
