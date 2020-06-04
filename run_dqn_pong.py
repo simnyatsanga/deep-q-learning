@@ -106,3 +106,22 @@ with open('mean_rewards.npy', 'wb') as rewards_file:
 
 # Save the final policy model
 torch.save(policy_model.state_dict(), "dqn_pong_model_final")
+
+# Sample 1000 frames from the replay buffer for analysis
+states, actions, rewards, next_states, done = replay_buffer.sample(1000)
+
+with open('sampled_states.npy', 'wb') as states_f:
+    np.save(states_f, states)
+
+with open('sampled_actions.npy', 'wb') as actions_f:
+    np.save(actions_f, np.array(actions))
+
+with open('sampled_rewards.npy', 'wb') as rewards_f:
+    np.save(rewards_f, np.array(rewards))
+
+with open('sampled_next_states.npy', 'wb') as next_states_f:
+    np.save(next_states_f, next_states)
+
+with open('sampled_done.npy', 'wb') as done_f:
+    np.save(done_f, np.array(done))
+
