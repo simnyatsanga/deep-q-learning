@@ -37,7 +37,7 @@ class QLearner(nn.Module):
         )
         
         self.fc = nn.Sequential(
-            nn.Linear(self.feature_size(), 512),
+            nn.Linear(self.feature_size(), 512), # Sample analysis frames from here
             nn.ReLU(),
             nn.Linear(512, self.num_actions)
         )
