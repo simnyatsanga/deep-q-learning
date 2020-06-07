@@ -28,7 +28,7 @@ epsilon_start = 1.0
 epsilon_final = 0.01
 epsilon_decay = 1000000
 replay_initial = 10000
-learning_rate = 1e-4
+learning_rate = 1e-5
 train_replay_buffer = ReplayBuffer(100000)
 analysis_replay_buffer = ReplayBuffer(100000)
 
